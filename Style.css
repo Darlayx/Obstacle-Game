@@ -1,1 +1,64 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+#gameCanvas {
+    border: 1px solid black;
+    touch-action: none; /* Mencegah scrolling pada perangkat sentuh */
+}
+
+.floating-text {
+    position: absolute;
+    color: black;
+    font-size: 24px;
+    pointer-events: none; /* Agar teks tidak mengganggu input sentuhan */
+}
+
+#score {
+    top: 20px;
+    left: 20px;
+}
+
+#highScore {
+    top: 20px;
+    right: 20px;
+}
+
+#lives {
+    bottom: 20px;
+    left: 20px;
+}
+
+#gameOverText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: red;
+    display: none; /* Sembunyikan secara default */
+    text-align: center;
+}
+
+#restartButton {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none; /* Sembunyikan secara default */
+}
 
