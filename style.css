@@ -1,64 +1,88 @@
-body {
+html, body {
     margin: 0;
-    overflow: hidden;
-    background-color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial, sans-serif;
+    padding: 0;
+    overflow: hidden; /* Mencegah scrollbar */
+    width: 100%;
+    height: 100%;
+    background-color: white; /* Latar belakang default jika canvas belum terisi */
+    font-family: 'Arial', sans-serif; /* Font yang lebih modern */
 }
 
 #gameCanvas {
-    border: 1px solid black;
-    touch-action: none; /* Mencegah scrolling pada perangkat sentuh */
+    display: block; /* Menghilangkan spasi ekstra di bawah canvas */
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    touch-action: none; /* Mencegah scrolling/zooming pada perangkat sentuh */
 }
 
 .floating-text {
     position: absolute;
     color: black;
-    font-size: 24px;
-    pointer-events: none; /* Agar teks tidak mengganggu input sentuhan */
+    font-size: clamp(16px, 3vw, 28px); /* Ukuran font responsif */
+    padding: 10px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sedikit shadow agar lebih terbaca */
+    pointer-events: none;
+    user-select: none; /* Mencegah teks terseleksi */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 #score {
-    top: 20px;
-    left: 20px;
+    top: 10px;
+    left: 10px;
 }
 
 #highScore {
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
+    text-align: right;
 }
 
 #lives {
-    bottom: 20px;
-    left: 20px;
+    bottom: 10px;
+    left: 10px;
+}
+
+#gameOverScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Overlay gelap */
+    display: none; /* Sembunyikan secara default */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 10; /* Pastikan di atas canvas */
 }
 
 #gameOverText {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 48px;
-    color: red;
-    display: none; /* Sembunyikan secara default */
-    text-align: center;
+    font-size: clamp(36px, 8vw, 72px);
+    color: #FF3B30; /* Merah yang lebih vibrant */
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 #restartButton {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
+    font-size: clamp(18px, 4vw, 30px);
+    padding: 15px 30px;
+    background-color: #34C759; /* Hijau yang lebih vibrant */
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
-    display: none; /* Sembunyikan secara default */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
+#restartButton:hover {
+    background-color: #2aa84a;
+}
+
+#restartButton:active {
+    transform: scale(0.95);
+}
