@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Game Rintangan Pro</title>
+    <title>Obstacle Evader Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <div id="score" class="floating-text">Skor: 0</div>
-    <div id="highScore" class="floating-text">Skor Tertinggi: 0</div>
-    <div id="lives" class="floating-text">Nyawa: 5</div>
-
-    <div id="gameOverScreen">
-        <div id="gameOverText">GAME OVER</div>
-        <button id="restartButton">Mulai Lagi</button>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="uiLayer">
+            <div id="hpDisplay" class="hud-element">HP: 100</div>
+            <div id="scoreDisplay" class="hud-element">Skor: 0</div>
+        </div>
+        <div id="gameOverScreen">
+            <div id="gameOverText">GAME OVER</div>
+            <div id="finalScoreText">Skor Akhir: 0</div>
+            <button id="restartButton">Mulai Lagi</button>
+        </div>
+        <div id="startScreen">
+            <div id="gameTitle">OBSTACLE EVADER</div>
+            <button id="startButton">Mulai</button>
+        </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
