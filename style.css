@@ -4,108 +4,116 @@ html, body {
     overflow: hidden;
     width: 100%;
     height: 100%;
-    font-family: 'Poppins', sans-serif;
-    background-color: #1e1e2f;
-    color: #e0e0e0;
-}
-
-#gameContainer {
-    width: 100%;
-    height: 100%;
-    position: relative;
+    background-color: #2c3e50; /* Latar belakang lebih gelap untuk tema modern */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font modern */
+    color: #ecf0f1; /* Warna teks default terang */
 }
 
 #gameCanvas {
     display: block;
     width: 100%;
     height: 100%;
-    background-color: #282a36;
+    background-color: #34495e; /* Warna canvas yang serasi */
     touch-action: none;
 }
 
-#uiLayer {
+#uiContainer {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    pointer-events: none;
+    padding: 15px 20px;
+    box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 15px 20px;
-    box-sizing: border-box;
+    pointer-events: none;
     z-index: 5;
 }
 
-.hud-element {
-    font-size: clamp(16px, 2.5vw, 24px);
-    font-weight: 600;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    padding: 8px 12px;
-    background-color: rgba(40, 42, 54, 0.7);
-    border-radius: 8px;
+.game-info {
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-/* CSS untuk Start Screen dan Game Over Screen (Default Tersembunyi) */
-#startScreen, #gameOverScreen {
+.game-info.left {
+    text-align: left;
+}
+
+.game-info.right {
+    text-align: right;
+}
+
+#hpDisplay {
+    color: #2ecc71; /* Warna hijau untuk HP */
+}
+
+#scoreDisplay {
+    color: #f1c40f; /* Warna kuning untuk skor */
+}
+
+#highScoreDisplay {
+    /* Posisi Skor Tertinggi akan di bawah Skor */
+    position: absolute; /* Ubah ke absolute agar bisa diatur relatif ke uiContainer */
+    top: 50px; /* Sesuaikan jarak dari atas */
+    right: 20px; /* Sesuaikan dengan padding uiContainer */
+    font-size: clamp(14px, 2.5vw, 22px); /* Sedikit lebih kecil */
+    color: #bdc3c7;
+}
+
+
+#gameOverScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(30, 30, 47, 0.95);
-    display: none; /* KEDUA LAYAR DEFAULT TERSEMBUNYI */
+    background-color: rgba(44, 62, 80, 0.85); /* Overlay lebih pekat */
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    z-index: 10; /* Di atas uiLayer dan gameCanvas */
-}
-
-#gameTitle {
-    font-size: clamp(32px, 7vw, 64px);
-    font-weight: 600;
-    color: #50fa7b;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    z-index: 10;
 }
 
 #gameOverText {
-    font-size: clamp(36px, 8vw, 72px);
-    color: #ff5555;
+    font-size: clamp(40px, 10vw, 80px);
+    color: #e74c3c; /* Merah yang kuat */
     margin-bottom: 15px;
-    font-weight: 600;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    font-weight: bold;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
 }
 
 #finalScoreText {
-    font-size: clamp(20px, 4vw, 30px);
-    color: #f8f8f2;
+    font-size: clamp(20px, 5vw, 35px);
+    color: #ecf0f1;
     margin-bottom: 30px;
 }
 
-#startButton, #restartButton {
-    font-family: 'Poppins', sans-serif;
-    font-size: clamp(18px, 3.5vw, 28px);
-    font-weight: 600;
-    padding: 12px 25px;
-    min-width: 180px;
-    background-image: linear-gradient(to right, #50fa7b, #43e067);
-    color: #282a36;
+#restartButton {
+    font-size: clamp(20px, 4vw, 32px);
+    padding: 18px 35px;
+    background: linear-gradient(145deg, #3498db, #2980b9); /* Gradient biru */
+    color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background-image 0.2s ease;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    transition: background 0.25s ease, transform 0.15s ease;
+    font-weight: bold;
 }
 
-#startButton:hover, #restartButton:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(80, 250, 123, 0.3);
+#restartButton:hover {
+    background: linear-gradient(145deg, #2980b9, #3498db);
 }
 
-#startButton:active, #restartButton:active {
-    transform: translateY(0px) scale(0.98);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+#restartButton:active {
+    transform: scale(0.96);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
