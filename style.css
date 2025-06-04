@@ -4,66 +4,64 @@ html, body {
     overflow: hidden;
     width: 100%;
     height: 100%;
-    background-color: #2c3e50; /* Latar belakang lebih gelap untuk tema modern */
+    background-color: #1a1a2e; /* Warna latar belakang utama yang lebih gelap */
+    color: #e0e0e0; /* Warna teks default yang lebih terang */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font modern */
-    color: #ecf0f1; /* Warna teks default terang */
 }
 
 #gameCanvas {
     display: block;
     width: 100%;
     height: 100%;
-    background-color: #34495e; /* Warna canvas yang serasi */
+    background-color: #1a1a2e; /* Disesuaikan dengan body */
     touch-action: none;
 }
 
 #uiContainer {
     position: absolute;
+    width: 100%;
+    height: auto;
     top: 0;
     left: 0;
-    width: 100%;
-    padding: 15px 20px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    pointer-events: none;
+    padding: 0;
     z-index: 5;
+    pointer-events: none; /* Agar tidak menghalangi interaksi dengan canvas */
 }
 
-.game-info {
-    font-size: clamp(18px, 3vw, 28px);
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+.hud-element {
+    position: absolute;
+    color: #f0f0f0; /* Warna teks HUD */
+    font-size: clamp(18px, 3.5vw, 32px); /* Ukuran font responsif yang sedikit lebih besar */
+    padding: 15px 20px; /* Padding lebih */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6); /* Shadow lebih jelas */
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    background-color: rgba(40, 40, 60, 0.6); /* Latar belakang semi-transparan untuk HUD */
+    border-radius: 0 0 8px 0; /* Rounded corner untuk HP */
 }
 
-.game-info.left {
-    text-align: left;
+#hpLabel {
+    top: 0;
+    left: 0;
+    border-radius: 0 0 8px 0;
 }
 
-.game-info.right {
+#scoreLabel {
+    top: 0;
+    right: 0;
     text-align: right;
+    border-radius: 0 0 0 8px; /* Rounded corner untuk Score */
 }
 
-#hpDisplay {
-    color: #2ecc71; /* Warna hijau untuk HP */
-}
-
-#scoreDisplay {
-    color: #f1c40f; /* Warna kuning untuk skor */
-}
-
-#highScoreDisplay {
-    /* Posisi Skor Tertinggi akan di bawah Skor */
-    position: absolute; /* Ubah ke absolute agar bisa diatur relatif ke uiContainer */
-    top: 50px; /* Sesuaikan jarak dari atas */
-    right: 20px; /* Sesuaikan dengan padding uiContainer */
-    font-size: clamp(14px, 2.5vw, 22px); /* Sedikit lebih kecil */
-    color: #bdc3c7;
+#highScoreLabel {
+    top: calc(clamp(18px, 3.5vw, 32px) + 30px + 15px); /* Posisi di bawah score, dengan kalkulasi padding + font size */
+    right: 0;
+    text-align: right;
+    font-size: clamp(14px, 2.5vw, 24px); /* Lebih kecil dari score utama */
+    background-color: rgba(40, 40, 60, 0.5);
+    border-radius: 0 0 0 8px;
 }
 
 
@@ -73,7 +71,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(44, 62, 80, 0.85); /* Overlay lebih pekat */
+    background-color: rgba(26, 26, 46, 0.85); /* Overlay lebih gelap dan tematik */
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -86,34 +84,35 @@ html, body {
     font-size: clamp(40px, 10vw, 80px);
     color: #e74c3c; /* Merah yang kuat */
     margin-bottom: 15px;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
     font-weight: bold;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
 }
 
 #finalScoreText {
     font-size: clamp(20px, 5vw, 35px);
-    color: #ecf0f1;
+    color: #f0f0f0;
     margin-bottom: 30px;
 }
 
 #restartButton {
-    font-size: clamp(20px, 4vw, 32px);
+    font-size: clamp(20px, 4.5vw, 32px);
     padding: 18px 35px;
-    background: linear-gradient(145deg, #3498db, #2980b9); /* Gradient biru */
+    background: linear-gradient(145deg, #3498db, #2980b9); /* Gradien biru modern */
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 12px; /* Lebih rounded */
     cursor: pointer;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transition: background 0.25s ease, transform 0.15s ease;
     font-weight: bold;
 }
 
 #restartButton:hover {
-    background: linear-gradient(145deg, #2980b9, #3498db);
+    background: linear-gradient(145deg, #2980b9, #1f6da1);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.4);
 }
 
 #restartButton:active {
     transform: scale(0.96);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
