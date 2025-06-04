@@ -5,21 +5,21 @@ html, body {
     width: 100%;
     height: 100%;
     font-family: 'Poppins', sans-serif;
-    background-color: #1e1e2f; /* Latar belakang gelap modern */
-    color: #e0e0e0; /* Teks terang */
+    background-color: #1e1e2f;
+    color: #e0e0e0;
 }
 
 #gameContainer {
     width: 100%;
     height: 100%;
-    position: relative; /* Untuk positioning absolut di dalamnya */
+    position: relative;
 }
 
 #gameCanvas {
     display: block;
     width: 100%;
     height: 100%;
-    background-color: #282a36; /* Warna canvas sedikit lebih terang */
+    background-color: #282a36;
     touch-action: none;
 }
 
@@ -29,13 +29,13 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Agar tidak menghalangi interaksi dengan canvas */
+    pointer-events: none;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     padding: 15px 20px;
     box-sizing: border-box;
-    z-index: 5; /* Di atas canvas, di bawah screen overlay */
+    z-index: 5;
 }
 
 .hud-element {
@@ -43,54 +43,37 @@ html, body {
     font-weight: 600;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     padding: 8px 12px;
-    background-color: rgba(40, 42, 54, 0.7); /* Latar HUD semi-transparan */
+    background-color: rgba(40, 42, 54, 0.7);
     border-radius: 8px;
 }
 
-/* CSS untuk Start Screen */
-#startScreen {
+/* CSS untuk Start Screen dan Game Over Screen (Default Tersembunyi) */
+#startScreen, #gameOverScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(30, 30, 47, 0.95);
-    display: flex; /* Akan diatur oleh JS, default bisa flex atau none */
+    display: none; /* KEDUA LAYAR DEFAULT TERSEMBUNYI */
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    z-index: 10;
+    z-index: 10; /* Di atas uiLayer dan gameCanvas */
 }
-
-/* CSS untuk Game Over Screen */
-#gameOverScreen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(30, 30, 47, 0.95);
-    display: none; /* Default tersembunyi */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    z-index: 10;
-}
-
 
 #gameTitle {
     font-size: clamp(32px, 7vw, 64px);
     font-weight: 600;
-    color: #50fa7b; /* Warna aksen hijau */
+    color: #50fa7b;
     margin-bottom: 30px;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
 #gameOverText {
     font-size: clamp(36px, 8vw, 72px);
-    color: #ff5555; /* Warna aksen merah */
+    color: #ff5555;
     margin-bottom: 15px;
     font-weight: 600;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
@@ -108,8 +91,8 @@ html, body {
     font-weight: 600;
     padding: 12px 25px;
     min-width: 180px;
-    background-image: linear-gradient(to right, #50fa7b, #43e067); /* Gradien hijau */
-    color: #282a36; /* Teks gelap agar kontras dengan tombol terang */
+    background-image: linear-gradient(to right, #50fa7b, #43e067);
+    color: #282a36;
     border: none;
     border-radius: 10px;
     cursor: pointer;
