@@ -35,6 +35,7 @@ html, body {
     align-items: flex-start;
     padding: 15px 20px;
     box-sizing: border-box;
+    z-index: 5; /* Di atas canvas, di bawah screen overlay */
 }
 
 .hud-element {
@@ -46,28 +47,38 @@ html, body {
     border-radius: 8px;
 }
 
-#hpDisplay {
-    /* Sudah di kiri atas by default flexbox */
-}
-
-#scoreDisplay {
-    /* Sudah di kanan atas by default flexbox */
-}
-
-#startScreen, #gameOverScreen {
+/* CSS untuk Start Screen */
+#startScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(30, 30, 47, 0.95); /* Overlay lebih pekat */
-    display: flex;
+    background-color: rgba(30, 30, 47, 0.95);
+    display: flex; /* Akan diatur oleh JS, default bisa flex atau none */
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     z-index: 10;
 }
+
+/* CSS untuk Game Over Screen */
+#gameOverScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 30, 47, 0.95);
+    display: none; /* Default tersembunyi */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 10;
+}
+
 
 #gameTitle {
     font-size: clamp(32px, 7vw, 64px);
@@ -103,7 +114,7 @@ html, body {
     border-radius: 10px;
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-image 0.2s ease;
 }
 
 #startButton:hover, #restartButton:hover {
