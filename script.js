@@ -10,14 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreText = document.getElementById('finalScoreText');
     const restartButton = document.getElementById('restartButton');
 
+    // Variabel game (sama seperti sebelumnya)
     const playerBaseColor = '#6272a4';
     const playerDamageColor = '#ff5555';
-
     let playerSize, playerX, playerY, playerVelocityX, playerHP;
     const playerSpeed = 8;
     let playerDamageFlashTimer = 0;
     const PLAYER_DAMAGE_FLASH_DURATION = 10;
-
     const obstacleTypes = [
         { shape: 'circle', sides: 0, damage: 3, color: '#f1fa8c', baseRotSpeed: 0.01 },
         { shape: 'triangle', sides: 3, damage: 6, color: '#ffb86c', baseRotSpeed: -0.015 },
@@ -26,27 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { shape: 'hexagon', sides: 6, damage: 20, color: '#ff5555', baseRotSpeed: 0.03 }
     ];
     let obstacles = [];
-
     let score = 0;
     let highScore = localStorage.getItem('obstacleEvaderHighScore') || 0;
-    let gameOver = true;
+    let gameOver = true; // Diatur true awalnya
     let animationFrameId;
     let isPointerDown = false;
-
     const initialMinSpawnInterval = 750;
     const initialMaxSpawnInterval = 1500;
     const initialMinSpeedBase = 1;
     const initialMaxSpeedBase = 3;
-
     let currentMinSpawnInterval, currentMaxSpawnInterval;
     let currentMinSpeedBase, currentMaxSpeedBase;
     let speedMultiplier;
-
     let lastObstacleSpawnTime = 0;
     let nextSpawnDelay = 0;
-
     const multiplierInterval = 15000;
     let lastMultiplierTime = 0;
+
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -60,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerY = canvas.height - playerSize - 20;
     }
 
+    // ... (Fungsi drawPlayer, drawPolygon, drawObstacles, updatePlayerPosition, spawnObstacle, updateObstacles, checkCollision, applyMultiplier SAMA SEPERTI SEBELUMNYA) ...
     function drawPlayer() {
         let currentColor = playerBaseColor;
         if (playerDamageFlashTimer > 0) {
@@ -106,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function spawnObstacle() {
-        if (gameOver) return; // Jangan spawn jika game over
+        if (gameOver) return;
         const currentTime = Date.now();
         if (currentTime - lastObstacleSpawnTime > nextSpawnDelay) {
             const typeIndex = Math.floor(Math.random() * obstacleTypes.length);
@@ -166,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applyMultiplier() {
-        if (gameOver) return; // Jangan terapkan jika game over
+        if (gameOver) return; 
         const currentTime = Date.now();
         if (currentTime - lastMultiplierTime > multiplierInterval) {
             currentMinSpawnInterval = Math.max(50, currentMinSpawnInterval / 1.1);
@@ -178,21 +174,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     function triggerEndGame() {
+        console.log("Triggering End Game");
         gameOver = true;
         isPointerDown = false;
-        playerVelocityX = 0;
+        playerVelocityX = 0; // Hentikan pergerakan player
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
-            animationFrameId = null; // Reset ID
+            animationFrameId = null;
         }
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('obstacleEvaderHighScore', highScore);
         }
         finalScoreText.textContent = `Skor Akhir: ${score}`;
-        startScreen.style.display = 'none'; // Pastikan start screen tersembunyi
-        gameOverScreen.style.display = 'flex'; // Tampilkan game over
+        
+        // Eksplisit sembunyikan semua layar lain dan tampilkan game over
+        startScreen.style.display = 'none';
+        gameOverScreen.style.display = 'flex';
+        console.log("Game Over Screen should be visible.");
     }
 
     function resetGame() {
@@ -200,11 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         score = 0;
         obstacles = [];
         
-        // Panggil resizeCanvas untuk posisi player yang benar berdasarkan ukuran layar saat ini
-        // playerX dan playerY akan diatur ulang di dalam resizeCanvas jika gameOver true
-        // atau jika playerX undefined, yang akan terjadi pada pemanggilan pertama resetGame.
-        // resizeCanvas(); // Tidak perlu eksplisit di sini jika startGame memanggilnya atau sudah dipanggil
-
         playerVelocityX = 0;
         playerDamageFlashTimer = 0;
         isPointerDown = false;
@@ -218,12 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMaxSpeedBase = initialMaxSpeedBase;
         speedMultiplier = 1.0;
 
-        lastObstacleSpawnTime = Date.now();
-        nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
-        lastMultiplierTime = Date.now();
+        // Waktu direset di startGame setelah resetGame dipanggil
     }
 
     function startGame() {
+        console.log("Attempting to start game...");
         // Pastikan kontrol dan state bersih sebelum mulai
         isPointerDown = false;
         playerVelocityX = 0;
@@ -232,46 +227,47 @@ document.addEventListener('DOMContentLoaded', () => {
             animationFrameId = null;
         }
 
+        // Eksplisit atur layar yang benar
         startScreen.style.display = 'none';
         gameOverScreen.style.display = 'none';
+        console.log("Start and Game Over screens hidden.");
         
-        gameOver = false; // Set game state menjadi tidak game over
-        resizeCanvas(); // Atur ukuran canvas & posisi awal player
-        resetGame(); // Reset semua variabel game ke kondisi awal
+        gameOver = false;
+        resizeCanvas(); // Penting untuk posisi player awal yang benar
+        resetGame(); 
         
-        // Pastikan lastMultiplierTime diset ke waktu sekarang agar tidak langsung trigger multiplier
         lastMultiplierTime = Date.now();
-        lastObstacleSpawnTime = Date.now(); // Juga untuk spawn awal
+        lastObstacleSpawnTime = Date.now(); 
         nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
 
-
-        gameLoop(); // Mulai game loop
+        console.log("Game setup complete. Starting loop.");
+        gameLoop();
     }
 
     function gameLoop() {
         if (gameOver) {
-            // Jika game over dipanggil di tengah loop (misal dari checkCollision),
-            // pastikan loop berhenti dan tidak request frame baru.
-            if (animationFrameId) {
+            if (animationFrameId) { // Pastikan loop benar-benar berhenti
                  cancelAnimationFrame(animationFrameId);
                  animationFrameId = null;
             }
             return;
         }
 
-        applyMultiplier(); // Terapkan multiplier jika waktunya
-        spawnObstacle();   // Spawn rintangan baru
-        updatePlayerPosition(); // Update posisi player
-        updateObstacles();      // Update posisi semua rintangan
-        checkCollision();       // Cek tabrakan
+        // Proses game logic hanya jika tidak game over
+        applyMultiplier();
+        spawnObstacle();
+        updatePlayerPosition();
+        updateObstacles();
+        checkCollision();
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
-        drawObstacles();   // Gambar rintangan
-        drawPlayer();      // Gambar player
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawObstacles();
+        drawPlayer();
 
-        animationFrameId = requestAnimationFrame(gameLoop); // Lanjutkan loop
+        animationFrameId = requestAnimationFrame(gameLoop);
     }
 
+    // ... (Fungsi handlePointerDown, handlePointerMove, handlePointerUp, processPointerMove SAMA SEPERTI SEBELUMNYA) ...
     function handlePointerDown(event) {
         event.preventDefault();
         if (gameOver) return;
@@ -288,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handlePointerUp(event) {
         event.preventDefault();
         isPointerDown = false;
-        if (!gameOver) { // Hanya hentikan player jika game tidak sedang game over
+        if (!gameOver) { 
             playerVelocityX = 0;
         }
     }
@@ -309,6 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+    // Event Listeners
     canvas.addEventListener('mousedown', handlePointerDown);
     canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
     canvas.addEventListener('mousemove', handlePointerMove);
@@ -318,21 +316,21 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchcancel', handlePointerUp);
 
     window.addEventListener('resize', () => {
-        const wasGameOver = gameOver; // Simpan state gameOver sebelum resize
-        resizeCanvas();
-        // Jika game tidak sedang berjalan (misalnya di start/game over screen),
-        // tidak perlu melakukan redraw game elements, cukup canvas size.
-        if (!wasGameOver && !gameOver) { // Jika game sedang berjalan aktif
-            // Mungkin perlu redraw atau biarkan gameLoop berikutnya
-        }
+        resizeCanvas(); // Cukup panggil resizeCanvas
     });
 
     startButton.addEventListener('click', startGame);
     restartButton.addEventListener('click', startGame);
 
-    // Inisialisasi awal tampilan
-    resizeCanvas(); // Panggil resize untuk set ukuran awal canvas dan posisi player
-    startScreen.style.display = 'flex';
-    gameOverScreen.style.display = 'none';
-    gameOver = true; // Set game over true agar loop tidak jalan sebelum start
+    // Inisialisasi awal tampilan aplikasi
+    function initializeApp() {
+        console.log("Initializing App");
+        resizeCanvas(); 
+        startScreen.style.display = 'flex'; // Tampilkan start screen secara eksplisit
+        gameOverScreen.style.display = 'none'; // Pastikan game over screen tersembunyi
+        gameOver = true; // Game belum dimulai
+        console.log("App Initialized. Start screen should be visible.");
+    }
+
+    initializeApp(); // Panggil fungsi inisialisasi
 });
