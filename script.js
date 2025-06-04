@@ -10,54 +10,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreText = document.getElementById('finalScoreText');
     const restartButton = document.getElementById('restartButton');
 
-    const playerBaseColor = '#6272a4'; // Warna player (biru keabuan)
-    const playerDamageColor = '#ff5555'; // Merah untuk damage flash
+    const playerBaseColor = '#6272a4';
+    const playerDamageColor = '#ff5555';
 
     let playerSize, playerX, playerY, playerVelocityX, playerHP;
     const playerSpeed = 8;
     let playerDamageFlashTimer = 0;
-    const PLAYER_DAMAGE_FLASH_DURATION = 10; // frames
+    const PLAYER_DAMAGE_FLASH_DURATION = 10;
 
     const obstacleTypes = [
-        { shape: 'circle', sides: 0, damage: 3, color: '#f1fa8c', baseRotSpeed: 0.01 }, // Kuning
-        { shape: 'triangle', sides: 3, damage: 6, color: '#ffb86c', baseRotSpeed: -0.015 }, // Oranye
-        { shape: 'square', sides: 4, damage: 10, color: '#ff79c6', baseRotSpeed: 0.02 }, // Pink
-        { shape: 'pentagon', sides: 5, damage: 15, color: '#bd93f9', baseRotSpeed: -0.025 }, // Ungu
-        { shape: 'hexagon', sides: 6, damage: 20, color: '#ff5555', baseRotSpeed: 0.03 }  // Merah
+        { shape: 'circle', sides: 0, damage: 3, color: '#f1fa8c', baseRotSpeed: 0.01 },
+        { shape: 'triangle', sides: 3, damage: 6, color: '#ffb86c', baseRotSpeed: -0.015 },
+        { shape: 'square', sides: 4, damage: 10, color: '#ff79c6', baseRotSpeed: 0.02 },
+        { shape: 'pentagon', sides: 5, damage: 15, color: '#bd93f9', baseRotSpeed: -0.025 },
+        { shape: 'hexagon', sides: 6, damage: 20, color: '#ff5555', baseRotSpeed: 0.03 }
     ];
     let obstacles = [];
 
-    // Game State
     let score = 0;
-    let highScore = localStorage.getItem('obstacleEvaderHighScore') || 0; // Update nama highscore
-    let gameOver = true; // Mulai dengan game over (di start screen)
+    let highScore = localStorage.getItem('obstacleEvaderHighScore') || 0;
+    let gameOver = true;
     let animationFrameId;
     let isPointerDown = false;
 
-    // Initial Game Parameters
-    const initialMinSpawnInterval = 750; // ms
-    const initialMaxSpawnInterval = 1500; // ms (dulu 100-750, diubah agar lebih mudah di awal)
-    const initialMinSpeedBase = 1; // pixels per frame
-    const initialMaxSpeedBase = 3; // pixels per frame
+    const initialMinSpawnInterval = 750;
+    const initialMaxSpawnInterval = 1500;
+    const initialMinSpeedBase = 1;
+    const initialMaxSpeedBase = 3;
 
     let currentMinSpawnInterval, currentMaxSpawnInterval;
     let currentMinSpeedBase, currentMaxSpeedBase;
-    let speedMultiplier; // Untuk peningkatan kecepatan global
+    let speedMultiplier;
 
     let lastObstacleSpawnTime = 0;
     let nextSpawnDelay = 0;
 
-    // Multiplier Feature
-    const multiplierInterval = 15000; // 15 detik
+    const multiplierInterval = 15000;
     let lastMultiplierTime = 0;
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         playerSize = canvas.height * 0.035 > 20 ? canvas.height * 0.035 : 20;
-        if (!gameOver || playerX === undefined) { // Atur posisi awal saat resize atau pertama kali
+        if (playerX === undefined || gameOver) { 
             playerX = canvas.width / 2 - playerSize / 2;
-        } else { // Jaga player tetap dalam batas
+        } else {
              playerX = Math.max(0, Math.min(playerX, canvas.width - playerSize));
         }
         playerY = canvas.height - playerSize - 20;
@@ -66,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawPlayer() {
         let currentColor = playerBaseColor;
         if (playerDamageFlashTimer > 0) {
-            // Efek flash: ganti warna jika timer ganjil/genap, atau cukup satu warna damage
             currentColor = (playerDamageFlashTimer % 4 < 2) ? playerDamageColor : playerBaseColor;
             playerDamageFlashTimer--;
         }
@@ -80,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.rotate(angle);
         ctx.fillStyle = color;
         ctx.beginPath();
-        if (sides === 0) { // Lingkaran
+        if (sides === 0) {
             ctx.arc(0, 0, radius, 0, Math.PI * 2);
         } else {
             ctx.moveTo(radius, 0);
@@ -103,30 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePlayerPosition() {
         if (gameOver) return;
         playerX += playerVelocityX;
-        playerY = canvas.height - playerSize - 20; // Jaga posisi Y tetap
+        playerY = canvas.height - playerSize - 20;
 
         if (playerX < 0) playerX = 0;
         if (playerX + playerSize > canvas.width) playerX = canvas.width - playerSize;
     }
 
     function spawnObstacle() {
+        if (gameOver) return; // Jangan spawn jika game over
         const currentTime = Date.now();
         if (currentTime - lastObstacleSpawnTime > nextSpawnDelay) {
             const typeIndex = Math.floor(Math.random() * obstacleTypes.length);
             const type = obstacleTypes[typeIndex];
-            const radius = canvas.width * 0.02 + Math.random() * (canvas.width * 0.015); // Ukuran rintangan bervariasi
-
+            const radius = canvas.width * 0.02 + Math.random() * (canvas.width * 0.015);
             const x = Math.random() * (canvas.width - radius * 2) + radius;
             const speed = (Math.random() * (currentMaxSpeedBase - currentMinSpeedBase) + currentMinSpeedBase) * speedMultiplier;
             
             obstacles.push({
-                x: x,
-                y: -radius,
-                radius: radius,
-                type: type,
-                speed: speed,
-                angle: Math.random() * Math.PI * 2, // Sudut awal acak
-                rotationSpeed: type.baseRotSpeed * (Math.random() * 0.5 + 0.75) // Variasi kecepatan rotasi
+                x: x, y: -radius, radius: radius, type: type, speed: speed,
+                angle: Math.random() * Math.PI * 2,
+                rotationSpeed: type.baseRotSpeed * (Math.random() * 0.5 + 0.75)
             });
             lastObstacleSpawnTime = currentTime;
             nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
@@ -142,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (obs.y - obs.radius > canvas.height) {
                 obstacles.splice(i, 1);
                 if (!gameOver) {
-                    score += 10; // Skor per rintangan dihindari
+                    score += 10;
                     scoreDisplay.textContent = `Skor: ${score}`;
                 }
             }
@@ -152,26 +144,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkCollision() {
         if (gameOver) return;
         obstacles.forEach((obstacle, index) => {
-            // Perhitungan jarak antara pusat player (persegi) dan pusat obstacle (poligon)
-            // Ini adalah deteksi sederhana berbasis lingkaran, bisa ditingkatkan untuk poligon vs persegi
             const playerCenterX = playerX + playerSize / 2;
             const playerCenterY = playerY + playerSize / 2;
-
             const distDX = playerCenterX - obstacle.x;
             const distDY = playerCenterY - obstacle.y;
-            // Menggunakan jarak antar pusat, ditambah buffer playerSize/2 dan obstacle.radius
             const distance = Math.sqrt(distDX * distDX + distDY * distDY);
 
-            if (distance < obstacle.radius + playerSize / 2 * 0.8) { // 0.8 faktor toleransi
+            if (distance < obstacle.radius + playerSize / 2 * 0.8) {
                 obstacles.splice(index, 1);
                 playerHP -= obstacle.type.damage;
                 hpDisplay.textContent = `HP: ${playerHP}`;
                 playerDamageFlashTimer = PLAYER_DAMAGE_FLASH_DURATION;
-
-                // Efek getar sederhana (opsional)
-                // canvas.style.transform = `translateX(${Math.random() > 0.5 ? 5 : -5}px)`;
-                // setTimeout(() => canvas.style.transform = '', 50);
-
 
                 if (playerHP <= 0) {
                     playerHP = 0;
@@ -183,15 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applyMultiplier() {
+        if (gameOver) return; // Jangan terapkan jika game over
         const currentTime = Date.now();
         if (currentTime - lastMultiplierTime > multiplierInterval) {
             currentMinSpawnInterval = Math.max(50, currentMinSpawnInterval / 1.1);
-            currentMaxSpawnInterval = Math.max(100, currentMaxSpawnInterval / 1.11); // Sedikit perbedaan agar range tetap ada
-            if (currentMinSpawnInterval > currentMaxSpawnInterval) currentMaxSpawnInterval = currentMinSpawnInterval + 50;
+            currentMaxSpawnInterval = Math.max(100, currentMaxSpawnInterval / 1.11);
+            if (currentMinSpawnInterval >= currentMaxSpawnInterval) currentMaxSpawnInterval = currentMinSpawnInterval + 50;
 
-            speedMultiplier *= 1.075; // Meningkatkan kecepatan global (dulu 0.75, ini salah tafsir, seharusnya meningkatkan)
-            
-            console.log(`Multiplier Applied: Spawn [${currentMinSpawnInterval.toFixed(0)}-${currentMaxSpawnInterval.toFixed(0)}ms], Speed Multi: ${speedMultiplier.toFixed(2)}x`);
+            speedMultiplier *= 1.075;
             lastMultiplierTime = currentTime;
         }
     }
@@ -200,21 +182,29 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOver = true;
         isPointerDown = false;
         playerVelocityX = 0;
-        cancelAnimationFrame(animationFrameId);
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null; // Reset ID
+        }
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('obstacleEvaderHighScore', highScore);
         }
         finalScoreText.textContent = `Skor Akhir: ${score}`;
-        gameOverScreen.style.display = 'flex';
+        startScreen.style.display = 'none'; // Pastikan start screen tersembunyi
+        gameOverScreen.style.display = 'flex'; // Tampilkan game over
     }
 
     function resetGame() {
         playerHP = 100;
         score = 0;
         obstacles = [];
-        playerX = canvas.width / 2 - playerSize / 2;
-        playerY = canvas.height - playerSize - 20;
+        
+        // Panggil resizeCanvas untuk posisi player yang benar berdasarkan ukuran layar saat ini
+        // playerX dan playerY akan diatur ulang di dalam resizeCanvas jika gameOver true
+        // atau jika playerX undefined, yang akan terjadi pada pemanggilan pertama resetGame.
+        // resizeCanvas(); // Tidak perlu eksplisit di sini jika startGame memanggilnya atau sudah dipanggil
+
         playerVelocityX = 0;
         playerDamageFlashTimer = 0;
         isPointerDown = false;
@@ -222,44 +212,64 @@ document.addEventListener('DOMContentLoaded', () => {
         hpDisplay.textContent = `HP: ${playerHP}`;
         scoreDisplay.textContent = `Skor: ${score}`;
 
-        // Reset parameter game ke awal
         currentMinSpawnInterval = initialMinSpawnInterval;
         currentMaxSpawnInterval = initialMaxSpawnInterval;
         currentMinSpeedBase = initialMinSpeedBase;
         currentMaxSpeedBase = initialMaxSpeedBase;
         speedMultiplier = 1.0;
 
-        lastObstacleSpawnTime = Date.now(); // Reset agar tidak langsung spawn banyak
+        lastObstacleSpawnTime = Date.now();
         nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
-        lastMultiplierTime = Date.now(); // Reset timer multiplier
+        lastMultiplierTime = Date.now();
     }
 
     function startGame() {
+        // Pastikan kontrol dan state bersih sebelum mulai
+        isPointerDown = false;
+        playerVelocityX = 0;
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+
         startScreen.style.display = 'none';
         gameOverScreen.style.display = 'none';
-        gameOver = false;
-        resetGame();
-        gameLoop();
+        
+        gameOver = false; // Set game state menjadi tidak game over
+        resizeCanvas(); // Atur ukuran canvas & posisi awal player
+        resetGame(); // Reset semua variabel game ke kondisi awal
+        
+        // Pastikan lastMultiplierTime diset ke waktu sekarang agar tidak langsung trigger multiplier
+        lastMultiplierTime = Date.now();
+        lastObstacleSpawnTime = Date.now(); // Juga untuk spawn awal
+        nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
+
+
+        gameLoop(); // Mulai game loop
     }
 
-
     function gameLoop() {
-        if (gameOver) return;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (!gameOver) { // Hanya update jika game berjalan
-            applyMultiplier();
-            spawnObstacle();
-            updatePlayerPosition();
-            updateObstacles();
-            checkCollision();
+        if (gameOver) {
+            // Jika game over dipanggil di tengah loop (misal dari checkCollision),
+            // pastikan loop berhenti dan tidak request frame baru.
+            if (animationFrameId) {
+                 cancelAnimationFrame(animationFrameId);
+                 animationFrameId = null;
+            }
+            return;
         }
-        
-        drawObstacles(); // Gambar rintangan dulu agar player di atas
-        drawPlayer();
 
-        animationFrameId = requestAnimationFrame(gameLoop);
+        applyMultiplier(); // Terapkan multiplier jika waktunya
+        spawnObstacle();   // Spawn rintangan baru
+        updatePlayerPosition(); // Update posisi player
+        updateObstacles();      // Update posisi semua rintangan
+        checkCollision();       // Cek tabrakan
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
+        drawObstacles();   // Gambar rintangan
+        drawPlayer();      // Gambar player
+
+        animationFrameId = requestAnimationFrame(gameLoop); // Lanjutkan loop
     }
 
     function handlePointerDown(event) {
@@ -277,9 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handlePointerUp(event) {
         event.preventDefault();
-        // if (gameOver) return; // Hapus ini agar player berhenti meski game over saat pointer masih di atas
         isPointerDown = false;
-        playerVelocityX = 0;
+        if (!gameOver) { // Hanya hentikan player jika game tidak sedang game over
+            playerVelocityX = 0;
+        }
     }
 
     function processPointerMove(event) {
@@ -298,28 +309,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event Listeners
     canvas.addEventListener('mousedown', handlePointerDown);
     canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
     canvas.addEventListener('mousemove', handlePointerMove);
     canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
-    window.addEventListener('mouseup', handlePointerUp); // Ganti ke window agar berhenti meski mouse di luar canvas
+    window.addEventListener('mouseup', handlePointerUp);
     window.addEventListener('touchend', handlePointerUp);
     window.addEventListener('touchcancel', handlePointerUp);
-    // canvas.addEventListener('mouseleave', handlePointerUp); // Bisa jadi masalah jika mouse cepat keluar masuk
 
     window.addEventListener('resize', () => {
+        const wasGameOver = gameOver; // Simpan state gameOver sebelum resize
         resizeCanvas();
-        // Tidak perlu redraw manual di sini jika game over, karena loop sudah berhenti
-        // Jika game berjalan, loop berikutnya akan menyesuaikan
+        // Jika game tidak sedang berjalan (misalnya di start/game over screen),
+        // tidak perlu melakukan redraw game elements, cukup canvas size.
+        if (!wasGameOver && !gameOver) { // Jika game sedang berjalan aktif
+            // Mungkin perlu redraw atau biarkan gameLoop berikutnya
+        }
     });
 
     startButton.addEventListener('click', startGame);
     restartButton.addEventListener('click', startGame);
 
-    // Inisialisasi awal
-    resizeCanvas();
-    startScreen.style.display = 'flex'; // Tampilkan layar mulai
-    // Game tidak langsung dimulai, menunggu klik tombol start
+    // Inisialisasi awal tampilan
+    resizeCanvas(); // Panggil resize untuk set ukuran awal canvas dan posisi player
+    startScreen.style.display = 'flex';
+    gameOverScreen.style.display = 'none';
+    gameOver = true; // Set game over true agar loop tidak jalan sebelum start
 });
-
