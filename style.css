@@ -4,19 +4,82 @@ html, body {
     overflow: hidden;
     width: 100%;
     height: 100%;
-    background-color: #1a1a2e; /* Warna latar belakang utama yang lebih gelap */
-    color: #e0e0e0; /* Warna teks default yang lebih terang */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font modern */
+    background-color: #12121a; /* Warna latar lebih gelap sedikit */
+    color: #e8e8e8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; /* Membantu centering jika diperlukan */
+    justify-content: center;
+    align-items: center;
 }
 
 #gameCanvas {
     display: block;
-    width: 100%;
-    height: 100%;
-    background-color: #1a1a2e; /* Disesuaikan dengan body */
-    touch-action: none;
+    /* width dan height akan diatur oleh JS atau jika ingin tetap 100% */
+    /* background-color: #1a1a2e; Dihapus karena body sudah mengatur background */
 }
 
+/* Main Menu Screen */
+#mainMenuScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2c2c3e 100%);
+    display: flex; /* Defaultnya tampil, akan diatur JS */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 20;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#gameTitle {
+    font-size: clamp(36px, 8vw, 70px);
+    color: #58a6ff; /* Biru terang */
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    font-weight: bold;
+}
+
+#startGameButton {
+    font-size: clamp(20px, 5vw, 32px);
+    padding: 15px 30px;
+    background: linear-gradient(145deg, #2ea043, #238636); /* Gradien hijau */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+#startGameButton:hover {
+    background: linear-gradient(145deg, #238636, #1c6f2b);
+}
+
+#startGameButton:active {
+    transform: scale(0.95);
+}
+
+#instructions {
+    font-size: clamp(14px, 3vw, 18px);
+    color: #b0b0b0; /* Abu-abu terang */
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+#menuHighScoreText {
+    font-size: clamp(16px, 3.5vw, 22px);
+    color: #f0b400; /* Emas untuk high score */
+}
+
+
+/* HUD (In-Game UI) */
 #uiContainer {
     position: absolute;
     width: 100%;
@@ -25,21 +88,21 @@ html, body {
     left: 0;
     padding: 0;
     z-index: 5;
-    pointer-events: none; /* Agar tidak menghalangi interaksi dengan canvas */
+    pointer-events: none;
+    display: none; /* Defaultnya sembunyi, tampil saat 'playing' */
 }
 
 .hud-element {
     position: absolute;
-    color: #f0f0f0; /* Warna teks HUD */
-    font-size: clamp(18px, 3.5vw, 32px); /* Ukuran font responsif yang sedikit lebih besar */
-    padding: 15px 20px; /* Padding lebih */
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6); /* Shadow lebih jelas */
+    color: #f0f0f0;
+    font-size: clamp(16px, 3vw, 28px); /* Sedikit lebih kecil */
+    padding: 12px 18px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    background-color: rgba(30, 30, 50, 0.65);
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    background-color: rgba(40, 40, 60, 0.6); /* Latar belakang semi-transparan untuk HUD */
-    border-radius: 0 0 8px 0; /* Rounded corner untuk HP */
 }
 
 #hpLabel {
@@ -52,67 +115,86 @@ html, body {
     top: 0;
     right: 0;
     text-align: right;
-    border-radius: 0 0 0 8px; /* Rounded corner untuk Score */
-}
-
-#highScoreLabel {
-    top: calc(clamp(18px, 3.5vw, 32px) + 30px + 15px); /* Posisi di bawah score, dengan kalkulasi padding + font size */
-    right: 0;
-    text-align: right;
-    font-size: clamp(14px, 2.5vw, 24px); /* Lebih kecil dari score utama */
-    background-color: rgba(40, 40, 60, 0.5);
     border-radius: 0 0 0 8px;
 }
 
+#highScoreLabel {
+    top: calc(clamp(16px, 3vw, 28px) + 24px + 10px);
+    right: 0;
+    text-align: right;
+    font-size: clamp(12px, 2vw, 20px);
+    background-color: rgba(30, 30, 50, 0.55);
+    border-radius: 0 0 0 8px;
+}
 
+/* Game Over Screen */
 #gameOverScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(26, 26, 46, 0.85); /* Overlay lebih gelap dan tematik */
-    display: none;
+    background-color: rgba(20, 20, 30, 0.9);
+    display: none; /* Defaultnya sembunyi */
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     z-index: 10;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 #gameOverText {
-    font-size: clamp(40px, 10vw, 80px);
-    color: #e74c3c; /* Merah yang kuat */
+    font-size: clamp(38px, 9vw, 75px);
+    color: #e74c3c;
     margin-bottom: 15px;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
     font-weight: bold;
 }
 
-#finalScoreText {
-    font-size: clamp(20px, 5vw, 35px);
+#finalScoreText, #gameOverHighScoreText {
+    font-size: clamp(18px, 4.5vw, 30px);
     color: #f0f0f0;
+    margin-bottom: 10px;
+}
+#gameOverHighScoreText {
+    color: #f0b400; /* Emas untuk high score */
     margin-bottom: 30px;
 }
 
-#restartButton {
-    font-size: clamp(20px, 4.5vw, 32px);
-    padding: 18px 35px;
-    background: linear-gradient(145deg, #3498db, #2980b9); /* Gradien biru modern */
+.button-container {
+    display: flex;
+    gap: 20px; /* Jarak antar tombol */
+    margin-top: 20px;
+}
+
+.game-over-button { /* Styling umum untuk tombol di game over screen */
+    font-size: clamp(16px, 3.5vw, 26px);
+    padding: 12px 25px;
     color: white;
     border: none;
-    border-radius: 12px; /* Lebih rounded */
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: background 0.25s ease, transform 0.15s ease;
-    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-weight: 500;
 }
 
+#restartButton {
+    background: linear-gradient(145deg, #3498db, #2980b9); /* Biru */
+}
 #restartButton:hover {
     background: linear-gradient(145deg, #2980b9, #1f6da1);
-    box-shadow: 0 7px 20px rgba(0,0,0,0.4);
 }
 
-#restartButton:active {
+#returnToMenuButton {
+    background: linear-gradient(145deg, #7f8c8d, #6c7a7b); /* Abu-abu */
+}
+#returnToMenuButton:hover {
+    background: linear-gradient(145deg, #6c7a7b, #536061);
+}
+
+.game-over-button:active {
     transform: scale(0.96);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
