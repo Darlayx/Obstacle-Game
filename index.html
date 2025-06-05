@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="mainMenuScreen">
+        <div id="gameTitle">Game Rintangan Pro</div>
+        <button id="startGameButton">Mulai Bermain</button>
+        <div id="instructions">Sentuh sisi kiri/kanan layar untuk bergerak.<br>Hindari rintangan!</div>
+        <div id="menuHighScoreText">Skor Tertinggi: 0</div>
+    </div>
+
     <div id="uiContainer">
         <div id="hpLabel" class="hud-element">HP: 100</div>
         <div id="scoreLabel" class="hud-element">Skor: 0</div>
@@ -17,7 +24,11 @@
     <div id="gameOverScreen">
         <div id="gameOverText">GAME OVER</div>
         <div id="finalScoreText">Skor Akhir: 0</div>
-        <button id="restartButton">Mulai Lagi</button>
+        <div id="gameOverHighScoreText">Skor Tertinggi: 0</div>
+        <div class="button-container">
+            <button id="restartButton" class="game-over-button">Ulangi</button>
+            <button id="returnToMenuButton" class="game-over-button">Menu Utama</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
