@@ -18,14 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restartButton');
     const returnToMenuButton = document.getElementById('returnToMenuButton');
 
-    // Game States: 'mainMenu', 'playing', 'gameOver'
     let gameState = 'mainMenu';
 
-    // Game Constants
     const PLAYER_MAX_HP = 100;
-    const PLAYER_DEFAULT_COLOR = '#4a90e2'; // Warna player baru
+    const PLAYER_DEFAULT_COLOR = '#4a90e2';
     const PLAYER_HIT_COLOR = '#e74c3c';
-    const PLAYER_HIT_DURATION = 200; // ms
+    const PLAYER_HIT_DURATION = 200;
     const MULTIPLIER_INTERVAL = 15000; 
     const SPAWN_INTERVAL_DIVISOR = 1.1;
     const SPEED_RANGE_MULTIPLIER_INCREASE = 1.075;
@@ -38,19 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'segienam', sides: 6, damage: 20, baseColor: [255, 0, 0], points: 5 }
     ];
 
-    // Game Variables
-    let playerSize, playerX, playerY, playerVelocityX, playerActualSpeedPPS; // playerActualSpeedPPS adalah kecepatan player dalam pixel per detik
+    let playerSize, playerX, playerY, playerVelocityX, playerActualSpeedPPS;
     let playerColor = PLAYER_DEFAULT_COLOR;
     let playerHitEndTime = 0;
 
     let obstacles = [];
     let obstacleBaseRadius;
 
-    // Initial dynamic game parameters
-    let initialMinSpawnInterval = 100; // ms (BARU: 100-1000 ms)
-    let initialMaxSpawnInterval = 1000; // ms
-    let initialMinObstacleSpeedPPS = 30;  // PPS (BARU: 30-300 PPS)
-    let initialMaxObstacleSpeedPPS = 300; // PPS
+    let initialMinSpawnInterval = 100;
+    let initialMaxSpawnInterval = 1000;
+    let initialMinObstacleSpeedPPS = 30;
+    let initialMaxObstacleSpeedPPS = 300;
 
     let currentMinSpawnInterval;
     let currentMaxSpawnInterval;
@@ -59,31 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let score, playerHP;
     let highScore = localStorage.getItem('obstacleProRevampedHighScore') || 0;
-    //gameOver flag tidak lagi utama, digantikan gameState, tapi bisa digunakan internal jika perlu
+    
     let lastObstacleSpawnTime;
     let animationFrameId;
     let isPointerDown = false;
     let gameStartTime;
     let lastMultiplierTime;
-    let lastFrameTime = 0;
+    let lastFrameTime = 0; // Inisialisasi penting untuk delta time
 
     function updateHighScoreDisplays() {
-        highScoreDisplay.textContent = `Skor Tertinggi: ${highScore}`; // HUD
-        menuHighScoreText.textContent = `Skor Tertinggi: ${highScore}`; // Main Menu
-        gameOverHighScoreText.textContent = `Skor Tertinggi: ${highScore}`; // Game Over
+        const hsText = `Skor Tertinggi: ${highScore}`;
+        highScoreDisplay.textContent = hsText;
+        menuHighScoreText.textContent = hsText;
+        gameOverHighScoreText.textContent = hsText;
     }
 
     function initializeGameParameters() {
-        // Mengurangi ukuran objek
-        playerSize = canvas.height * 0.025 > 12 ? canvas.height * 0.025 : 12; // Lebih kecil
+        playerSize = canvas.height * 0.025 > 12 ? canvas.height * 0.025 : 12;
         playerX = canvas.width / 2 - playerSize / 2;
-        playerY = canvas.height - playerSize - 15; // Posisi Y disesuaikan
+        playerY = canvas.height - playerSize - 15;
         playerVelocityX = 0; 
-        playerActualSpeedPPS = (canvas.width * 0.01 > 6 ? canvas.width * 0.01 : 6) * 50; // Perkiraan PPS, perlu penyesuaian rasa
-                                                                                        // Misal 6px/frame * 50fps (bukan 60 untuk sedikit lebih lambat) = 300 PPS
-                                                                                        // Atau nilai tetap: playerActualSpeedPPS = 250;
+        playerActualSpeedPPS = 300; // Contoh: 300 PPS, sesuaikan feel-nya
 
-        obstacleBaseRadius = canvas.height * 0.012 > 6 ? canvas.height * 0.012 : 6; // Lebih kecil
+        obstacleBaseRadius = canvas.height * 0.012 > 6 ? canvas.height * 0.012 : 6;
 
         currentMinSpawnInterval = initialMinSpawnInterval;
         currentMaxSpawnInterval = initialMaxSpawnInterval;
@@ -95,15 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         initializeGameParameters(); 
-        
         playerY = canvas.height - playerSize - 15;
-
         if (gameState === 'playing') {
             playerX = Math.max(0, Math.min(playerX, canvas.width - playerSize));
         }
     }
 
     function drawPlayer() {
+        // ... (kode drawPlayer tidak berubah)
         if (Date.now() < playerHitEndTime) {
             ctx.fillStyle = PLAYER_HIT_COLOR;
         } else {
@@ -118,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawPolygon(x, y, radius, sides, colorStr, rotation) {
+        // ... (kode drawPolygon tidak berubah)
         ctx.beginPath();
         ctx.moveTo(x + radius * Math.cos(rotation), y + radius * Math.sin(rotation));
         for (let i = 1; i <= sides; i++) {
@@ -132,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawObstacles() {
+        // ... (kode drawObstacles tidak berubah)
         obstacles.forEach(obstacle => {
             ctx.save();
             ctx.translate(obstacle.x, obstacle.y);
@@ -150,9 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updatePlayerPosition(deltaTime) { // Terima deltaTime
-        playerX += playerVelocityX * deltaTime; // playerVelocityX sekarang adalah +/- playerActualSpeedPPS
-        
+    function updatePlayerPosition(deltaTime) { 
+        playerX += playerVelocityX * deltaTime; 
         if (playerX < 0) {
             playerX = 0;
             if(playerVelocityX < 0) playerVelocityX = 0; 
@@ -164,16 +158,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function spawnObstacle() {
+        // ... (kode spawnObstacle tidak berubah signifikan, pastikan speed dan rotationSpeed adalah PPS/RPS)
         const randomTypeIndex = Math.floor(Math.random() * OBSTACLE_TYPES.length);
         const type = OBSTACLE_TYPES[randomTypeIndex];
         
         const radiusFactor = (type.sides === 0 || type.sides === 4) ? 1.0 : (type.sides === 3 ? 1.1 : (type.sides === 5 ? 1.2 : 1.3));
-        const radius = obstacleBaseRadius * radiusFactor; // Menggunakan obstacleBaseRadius yang lebih kecil
+        const radius = obstacleBaseRadius * radiusFactor;
         const x = Math.random() * (canvas.width - radius * 2) + radius;
         const y = -radius;
         
         const speedPPS = Math.random() * (currentMaxObstacleSpeedPPS - currentMinObstacleSpeedPPS) + currentMinObstacleSpeedPPS;
-        const rotationSpeedRPS = ((Math.random() - 0.5) * 0.05) * 60; // rad/frame * 60 = rad/detik (perkiraan)
+        const rotationSpeedRPS = ((Math.random() - 0.5) * 0.05) * 60; 
 
         obstacles.push({ x, y, radius, type, 
             speed: speedPPS, 
@@ -184,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateObstacles(deltaTime) {
+        // ... (kode updateObstacles tidak berubah signifikan)
         const currentTime = performance.now();
         const nextSpawnDelay = Math.random() * (currentMaxSpawnInterval - currentMinSpawnInterval) + currentMinSpawnInterval;
 
@@ -207,11 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function checkCollision() {
+        // ... (kode checkCollision tidak berubah)
         if (gameState !== 'playing') return;
 
         obstacles.forEach((obstacle, index) => {
             const playerCenterX = playerX + playerSize / 2;
-            const playerEffectiveRadius = playerSize * 0.40; // Disesuaikan karena player lebih kecil
+            const playerEffectiveRadius = playerSize * 0.40; 
             const playerCenterY = playerY + playerSize * 0.5; 
 
             const dx = obstacle.x - playerCenterX;
@@ -221,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (distance < obstacle.radius + playerEffectiveRadius) {
                 obstacles.splice(index, 1);
                 playerHP -= obstacle.type.damage;
-                playerHitEndTime = Date.now() + PLAYER_HIT_DURATION; // Date.now() ok untuk durasi singkat
+                playerHitEndTime = Date.now() + PLAYER_HIT_DURATION;
                 
                 if (playerHP <= 0) {
                     playerHP = 0;
@@ -233,16 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyMultiplier() {
+        // ... (kode applyMultiplier tidak berubah)
         currentMinSpawnInterval = Math.max(40, currentMinSpawnInterval / SPAWN_INTERVAL_DIVISOR);
         currentMaxSpawnInterval = Math.max(currentMinSpawnInterval + 50, currentMaxSpawnInterval / SPAWN_INTERVAL_DIVISOR);
-
         currentMinObstacleSpeedPPS *= SPEED_RANGE_MULTIPLIER_INCREASE;
         currentMaxObstacleSpeedPPS *= SPEED_RANGE_MULTIPLIER_INCREASE;
-
-        // Sesuaikan caps jika perlu, berdasarkan speed range baru (30-300)
         currentMinObstacleSpeedPPS = Math.min(currentMinObstacleSpeedPPS, 1500); 
         currentMaxObstacleSpeedPPS = Math.min(currentMaxObstacleSpeedPPS, 2500);
-
         console.log(`Multiplier: Spawn [${currentMinSpawnInterval.toFixed(0)}-${currentMaxSpawnInterval.toFixed(0)}ms], Speed [${currentMinObstacleSpeedPPS.toFixed(0)}-${currentMaxObstacleSpeedPPS.toFixed(0)}PPS]`);
         lastMultiplierTime = performance.now();
     }
@@ -251,11 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHpDisplay();
         updateScoreDisplay();
     }
-
     function updateHpDisplay() {
         hpDisplay.textContent = `HP: ${playerHP}`;
     }
-
     function updateScoreDisplay() {
         scoreDisplay.textContent = `Skor: ${score}`;
     }
@@ -264,36 +256,28 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState = newState;
         mainMenuScreen.style.display = (newState === 'mainMenu') ? 'flex' : 'none';
         uiContainer.style.display = (newState === 'playing') ? 'block' : 'none';
-        canvas.style.display = (newState === 'playing') ? 'block' : ((newState === 'mainMenu') ? 'none' : 'block'); // Canvas juga tampil di game over untuk background
+        canvas.style.display = (newState === 'mainMenu') ? 'none' : 'block';
         gameOverScreen.style.display = (newState === 'gameOver') ? 'flex' : 'none';
 
-        if (newState === 'mainMenu') {
-            updateHighScoreDisplays(); // Tampilkan high score terbaru di menu
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        } else if (newState === 'playing') {
-            // resetGame akan menangani start loop
-        } else if (newState === 'gameOver') {
-             if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
+        if (animationFrameId && (newState === 'mainMenu' || newState === 'gameOver')) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        if (newState === 'mainMenu' || newState === 'gameOver') {
+             updateHighScoreDisplays();
         }
     }
 
     function endGame() {
-        transitionToState('gameOver');
+        transitionToState('gameOver'); // Ini sudah membatalkan frame jika perlu
         isPointerDown = false; 
         playerVelocityX = 0;   
-        
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('obstacleProRevampedHighScore', highScore);
         }
         finalScoreText.textContent = `Skor Akhir: ${score}`;
-        updateHighScoreDisplays(); 
+        updateHighScoreDisplays(); // Memastikan high score di game over screen terupdate
     }
 
     function resetGame() {
@@ -303,48 +287,53 @@ document.addEventListener('DOMContentLoaded', () => {
         playerColor = PLAYER_DEFAULT_COLOR;
         playerHitEndTime = 0;
         isPointerDown = false; 
+        playerVelocityX = 0; // Pastikan velocity player juga reset
         
-        resizeCanvas(); // Ini akan memanggil initializeGameParameters()
+        resizeCanvas(); 
 
         lastObstacleSpawnTime = performance.now();
         gameStartTime = performance.now();
         lastMultiplierTime = gameStartTime;
-        lastFrameTime = performance.now(); 
+        
+        lastFrameTime = 0; // ***PERBAIKAN PENTING***: Reset untuk frame pertama gameLoop
 
         updateScoreAndHpDisplays();
         
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
         }
-        gameLoop(); // Mulai game loop
+        // ***PERBAIKAN PENTING***: Hanya jadwalkan gameLoop, jangan panggil langsung
+        animationFrameId = requestAnimationFrame(gameLoop); 
     }
 
     function gameLoop(currentTime) { 
         if (gameState !== 'playing') {
-             if (animationFrameId) { // Pastikan frame dibatalkan jika state bukan playing
+            // Jika ada frame yang 'lolos' setelah state berubah, batalkan.
+            // Seharusnya transitionToState sudah menangani ini.
+            if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = null;
             }
             return;
         }
 
-        if (!lastFrameTime) {
-            lastFrameTime = currentTime; 
+        // ***PERBAIKAN PENTING***: Logika untuk frame pertama / setelah reset
+        if (lastFrameTime === 0) { 
+            lastFrameTime = currentTime; // Inisialisasi untuk membuat deltaTime pertama valid (atau 0)
         }
         const deltaTime = (currentTime - lastFrameTime) / 1000; 
         lastFrameTime = currentTime;
-        const effectiveDeltaTime = Math.min(deltaTime, 1 / 30); // Max delta
+        const effectiveDeltaTime = Math.min(deltaTime, 1 / 30);
 
         if (performance.now() - lastMultiplierTime > MULTIPLIER_INTERVAL) {
             applyMultiplier();
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        updatePlayerPosition(effectiveDeltaTime); // Kirim deltaTime
+        updatePlayerPosition(effectiveDeltaTime); 
         updateObstacles(effectiveDeltaTime); 
         checkCollision();
-
         drawObstacles();
         drawPlayer();
 
@@ -353,10 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Player Controls
     function handlePointerDown(event) {
+        // ... (kode handlePointerDown tidak berubah)
         event.preventDefault();
         if (gameState !== 'playing') return;
         isPointerDown = true;
-        
         const rect = canvas.getBoundingClientRect();
         let pointerX;
         if (event.touches && event.touches.length > 0) {
@@ -364,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             pointerX = event.clientX - rect.left;
         }
-
         if (pointerX < canvas.width / 2) {
             playerVelocityX = -playerActualSpeedPPS; 
         } else {
@@ -373,20 +361,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handlePointerMove(event) {
+        // ... (kode handlePointerMove tidak berubah)
         event.preventDefault();
         if (gameState !== 'playing' || !isPointerDown) return;
-        // Arah tidak berubah saat drag, hanya berdasarkan tap awal
     }
 
     function handlePointerUp(event) {
+        // ... (kode handlePointerUp tidak berubah)
         event.preventDefault();
         isPointerDown = false;
-        if (gameState === 'playing') { // Hanya set velocity 0 jika masih dalam game
+        if (gameState === 'playing') {
              playerVelocityX = 0;
         }
     }
     
-    // Event Listeners
     canvas.addEventListener('mousedown', handlePointerDown);
     canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
     canvas.addEventListener('mousemove', handlePointerMove, { passive: false });
@@ -398,33 +386,26 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         const oldGameState = gameState;
         resizeCanvas(); 
-        // Kembalikan state tampilan jika bukan 'playing'
-        // karena resizeCanvas mungkin memicu initializeGameParameters yang tidak selalu diinginkan
-        // jika hanya resize window tanpa mengubah state game.
-        // Namun, dengan `transitionToState`, ini seharusnya sudah aman.
-        // Jika sebelumnya game over, pastikan game over screen tetap tampil, dsb.
         if (oldGameState !== 'playing') {
-            transitionToState(oldGameState); // Atur ulang tampilan yang benar
+            transitionToState(oldGameState); 
         }
     });
 
-    // Menu Buttons
     startGameButton.addEventListener('click', () => {
         transitionToState('playing');
-        resetGame();
+        resetGame(); // resetGame sekarang akan memulai gameLoop via requestAnimationFrame
     });
 
     restartButton.addEventListener('click', () => {
-        transitionToState('playing'); // Meskipun sudah di gameOver, ini untuk trigger yang benar
-        resetGame();
+        // transitionToState('playing'); // Tidak perlu jika resetGame dipanggil dari gameOver
+        resetGame(); // Langsung reset dan mulai lagi
     });
 
     returnToMenuButton.addEventListener('click', () => {
         transitionToState('mainMenu');
     });
 
-    // Initial Setup
-    updateHighScoreDisplays(); // Tampilkan high score awal di semua tempat
-    resizeCanvas();          // Panggil resize untuk set ukuran awal canvas dan parameter
-    transitionToState('mainMenu'); // Mulai dari main menu
+    updateHighScoreDisplays(); 
+    resizeCanvas();          
+    transitionToState('mainMenu');
 });
