@@ -1,36 +1,110 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Game Rintangan Pro Revamped</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Game Obstacle Sederhana</title>
+  <style>
+    /* Gaya dasar untuk body */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Area permainan */
+    #game {
+      position: relative;
+      width: 600px;
+      height: 200px;
+      background-color: #fff;
+      overflow: hidden;
+      border: 2px solid #333;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Pemain */
+    #player {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: #e74c3c;
+      bottom: 0;
+      left: 50px;
+      border-radius: 5px;
+    }
+
+    /* Animasi lompat untuk pemain */
+    .jump {
+      animation: jump 0.5s ease;
+    }
+
+    @keyframes jump {
+      0% { bottom: 0; }
+      50% { bottom: 120px; }
+      100% { bottom: 0; }
+    }
+
+    /* Rintangan */
+    #obstacle {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: #2ecc71;
+      bottom: 0;
+      left: 600px; /* Mulai keluar dari sisi kanan */
+      animation: obstacleMove 1.5s linear infinite;
+    }
+
+    @keyframes obstacleMove {
+      0% { left: 600px; }
+      100% { left: -30px; }
+    }
+  </style>
 </head>
 <body>
-    <div id="mainMenuScreen">
-        <div id="gameTitle">Game Rintangan Pro</div>
-        <button id="startGameButton">Mulai Bermain</button>
-        <div id="instructions">Sentuh sisi kiri/kanan layar untuk bergerak.<br>Hindari rintangan!</div>
-        <div id="menuHighScoreText">Skor Tertinggi: 0</div>
-    </div>
+  <div id="game">
+    <div id="player"></div>
+    <div id="obstacle"></div>
+  </div>
 
-    <div id="uiContainer">
-        <div id="hpLabel" class="hud-element">HP: 100</div>
-        <div id="scoreLabel" class="hud-element">Skor: 0</div>
-        <div id="highScoreLabel" class="hud-element">Skor Tertinggi: 0</div>
-    </div>
-    <canvas id="gameCanvas"></canvas>
+  <script>
+    // Variabel untuk elemen pemain dan rintangan
+    var player = document.getElementById("player");
+    var obstacle = document.getElementById("obstacle");
 
-    <div id="gameOverScreen">
-        <div id="gameOverText">GAME OVER</div>
-        <div id="finalScoreText">Skor Akhir: 0</div>
-        <div id="gameOverHighScoreText">Skor Tertinggi: 0</div>
-        <div class="button-container">
-            <button id="restartButton" class="game-over-button">Ulangi</button>
-            <button id="returnToMenuButton" class="game-over-button">Menu Utama</button>
-        </div>
-    </div>
+    // Fungsi untuk membuat pemain melompat
+    function jump() {
+      if (player.classList.contains("jump")) return; // Hindari lompatan ganda
+      player.classList.add("jump");
+      setTimeout(function() {
+        player.classList.remove("jump");
+      }, 500); // Sesuaikan dengan durasi animasi jump
+    }
 
-    <script src="script.js"></script>
+    // Listener untuk mendeteksi tombol spasi agar pemain melompat
+    document.addEventListener("keydown", function(event) {
+      if (event.code === "Space") {
+        jump();
+      }
+    });
+
+    // Cek tabrakan setiap 10ms
+    var collisionInterval = setInterval(function() {
+      var playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue("bottom"));
+      var obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+
+      // Jika rintangan berada dalam jarak horizontal pemain dan pemain tidak melompat cukup tinggi
+      if (obstacleLeft < 80 && obstacleLeft > 20 && playerBottom < 30) {
+        clearInterval(collisionInterval);
+        alert("Game Over!");
+        obstacle.style.animation = "none"; // Hentikan pergerakan rintangan
+      }
+    }, 10);
+  </script>
 </body>
 </html>
