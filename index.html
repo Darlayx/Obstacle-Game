@@ -1,110 +1,108 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Obstacle Sederhana</title>
-  <style>
-    /* Gaya dasar untuk body */
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-    }
-
-    /* Area permainan */
-    #game {
-      position: relative;
-      width: 600px;
-      height: 200px;
-      background-color: #fff;
-      overflow: hidden;
-      border: 2px solid #333;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Pemain */
-    #player {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: #e74c3c;
-      bottom: 0;
-      left: 50px;
-      border-radius: 5px;
-    }
-
-    /* Animasi lompat untuk pemain */
-    .jump {
-      animation: jump 0.5s ease;
-    }
-
-    @keyframes jump {
-      0% { bottom: 0; }
-      50% { bottom: 120px; }
-      100% { bottom: 0; }
-    }
-
-    /* Rintangan */
-    #obstacle {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: #2ecc71;
-      bottom: 0;
-      left: 600px; /* Mulai keluar dari sisi kanan */
-      animation: obstacleMove 1.5s linear infinite;
-    }
-
-    @keyframes obstacleMove {
-      0% { left: 600px; }
-      100% { left: -30px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Obstacle</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #gameCanvas {
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+    </style>
 </head>
 <body>
-  <div id="game">
-    <div id="player"></div>
-    <div id="obstacle"></div>
-  </div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-  <script>
-    // Variabel untuk elemen pemain dan rintangan
-    var player = document.getElementById("player");
-    var obstacle = document.getElementById("obstacle");
+        let character = { x: 50, y: 550, width: 30, height: 30 };
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
 
-    // Fungsi untuk membuat pemain melompat
-    function jump() {
-      if (player.classList.contains("jump")) return; // Hindari lompatan ganda
-      player.classList.add("jump");
-      setTimeout(function() {
-        player.classList.remove("jump");
-      }, 500); // Sesuaikan dengan durasi animasi jump
-    }
+        function drawCharacter() {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(character.x, character.y, character.width, character.height);
+        }
 
-    // Listener untuk mendeteksi tombol spasi agar pemain melompat
-    document.addEventListener("keydown", function(event) {
-      if (event.code === "Space") {
-        jump();
-      }
-    });
+        function drawObstacles() {
+            for (let obstacle of obstacles) {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            }
+        }
 
-    // Cek tabrakan setiap 10ms
-    var collisionInterval = setInterval(function() {
-      var playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue("bottom"));
-      var obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+        function generateObstacle() {
+            const width = Math.random() * 50 + 20;
+            const x = Math.random() * (canvas.width - width);
+            obstacles.push({ x: x, y: 0, width: width, height: 20 });
+        }
 
-      // Jika rintangan berada dalam jarak horizontal pemain dan pemain tidak melompat cukup tinggi
-      if (obstacleLeft < 80 && obstacleLeft > 20 && playerBottom < 30) {
-        clearInterval(collisionInterval);
-        alert("Game Over!");
-        obstacle.style.animation = "none"; // Hentikan pergerakan rintangan
-      }
-    }, 10);
-  </script>
+        function updateObstacles() {
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += 5; // Move downwards
+                if (obstacles[i].y > canvas.height) {
+                    obstacles.splice(i, 1);
+                    score++;
+                }
+            }
+        }
+
+        function checkCollision() {
+            for (let obstacle of obstacles) {
+                if (character.x < obstacle.x + obstacle.width &&
+                    character.x + character.width > obstacle.x &&
+                    character.y < obstacle.y + obstacle.height &&
+                    character.y + character.height > obstacle.y) {
+                    gameOver = true;
+                }
+            }
+        }
+
+        function drawScore() {
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 20);
+        }
+
+        function gameLoop() {
+            if (gameOver) {
+                ctx.fillStyle = 'black';
+                ctx.font = '40px Arial';
+                ctx.fillText('Game Over', 100, canvas.height / 2);
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCharacter();
+            drawObstacles();
+            drawScore();
+            updateObstacles();
+            checkCollision();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' && character.x < canvas.width - character.width) {
+                character.x += 15;
+            } else if (event.key === 'ArrowLeft' && character.x > 0) {
+                character.x -= 15;
+            }
+        });
+
+        setInterval(generateObstacle, 1000);
+        gameLoop();
+    </script>
 </body>
 </html>
